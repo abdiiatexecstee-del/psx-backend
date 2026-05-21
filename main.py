@@ -15,24 +15,21 @@ async def root(): return {"status": "online"}
 intents = discord.Intents.all() 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# --- 3. APKA SAARA LOGIC (Yahan paste karein) ---
-# Apni bot.py file ka saara content: 
-# WATCHLIST, functions, aur saare @bot.command yahan paste karein.
-# (Example)
-@bot.command(name="watchlist")
-async def show_watchlist(ctx):
-    await ctx.send("📋 Active Assets are being tracked.")
-
-@bot.event
-async def on_ready():
-    print(f"Logged in as {bot.user}")
+# --- 3. BOT.PY KA POORA LOGIC YAHAN PASTE KAREIN ---
+# Apni 'bot.py' file ka saara content: 
+# WATCHLIST list, saare 'def' functions, aur saare '@bot.command'
+# yahan 'bot = ...' ke niche aur 'if __name__' ke upar paste karein.
+# --- [END LOGIC] ---
 
 # --- 4. Execution ---
 def run_bot():
     token = os.getenv("DISCORD_TOKEN")
+    if not token:
+        print("Error: DISCORD_TOKEN variable missing in Railway!")
+        return
     bot.run(token)
 
 if __name__ == "__main__":
-    # Bot aur Server dono ko start karein
     threading.Thread(target=run_bot, daemon=True).start()
-    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8080)))
+    port = int(os.getenv("PORT", 8080))
+    uvicorn.run(app, host="0.0.0.0", port=port)
