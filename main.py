@@ -57,3 +57,35 @@ if __name__ == "__main__":
     
     # Start FastAPI
     uvicorn.run(app, host="0.0.0.0", port=8000)
+    import os
+import threading
+import uvicorn
+from fastapi import FastAPI
+import discord
+from discord.ext import commands
+import asyncio
+import psxdata
+import pandas as pd
+import numpy as np
+from ta.momentum import RSIIndicator
+from ta.trend import MACD
+
+# ... (Yahan wo saare imports add karein jo bot.py mein hain) ...
+
+app = FastAPI()
+intents = discord.Intents.default()
+intents.message_content = True
+bot = commands.Bot(command_prefix="!", intents=intents)
+
+# ... (Yahan WATCHLIST, DIVIDEND_DATABASE aur saare functions paste karein: fetch_data, process_metrics, etc.) ...
+
+@bot.command(name="psx")
+async def psx(ctx, symbol: str = None):
+    # Ab yahan aapka asli logic chalega jo bot.py mein tha
+    if not symbol: return await ctx.send("❌ Usage: `!psx BOP`")
+    # ... (yahan process_metrics aur response ka logic aayega) ...
+
+# 3. Execution
+if __name__ == "__main__":
+    threading.Thread(target=lambda: bot.run(os.getenv("DISCORD_TOKEN")), daemon=True).start()
+    uvicorn.run(app, host="0.0.0.0", port=8000)
