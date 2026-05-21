@@ -1,159 +1,40 @@
 import os
-import threading
 import uvicorn
-from fastapi import FastAPI
-import discord
-from discord.ext import commands, tasks
 import asyncio
-import psxdata
-import pandas as pd
-import numpy as np
-from datetime import datetime, timezone
-import traceback
-import io
-import matplotlib
-matplotlib.use('Agg')
-import mplfinance as mpf
+import discord
+from discord.ext import commands
+from fastapi import FastAPI
+import threading
 
-# 1. FastAPI App Initialize
+# Initialize FastAPI
 app = FastAPI()
 
 @app.get("/")
 def read_root():
-    return {"message": "PSX Bot Backend is live!"}
+    return {"status": "online"}
 
-# 2. Discord Bot Setup
-intents = discord.Intents.default()
-intents.message_content = True
-bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
-
-# Configuration & State
-WATCHLIST = ["786", "AABS", "AATM", "ABOT", "ACPL", "AGHA", "AGTL", "AHCL", "AICL", "AIRLINK"]
-DIVIDEND_DATABASE = {"FFC": {"yield": "14.2%", "payout": "88%", "sector": "Fertilizer"}}
-
-# [Yahan par aapka process_metrics, fetch_data, aur generate_chart_buffer ka code aayega]
-# (Aapne jo bot.py file di hai, uske functions ko yahan copy karein)
-
-@bot.command(name="psx")
-async def psx(ctx, symbol: str = None):
-    # Aapka psx command logic
-    await ctx.send("PSX Signal logic active!")
-
-@bot.command(name="watchlist")
-async def show_watchlist(ctx):
-    await ctx.send(f"📋 **Active Assets:** {', '.join(WATCHLIST)}")
-
-# 3. Execution Engine
-def run_bot():
-    token = os.getenv("DISCORD_TOKEN")
-    if not token:
-        print("Error: DISCORD_TOKEN missing in Environment Variables")
-        return
-    bot.run(token)
-
-if __name__ == "__main__":
-    # Start Bot in background thread
-    threading.Thread(target=run_bot, daemon=True).start()
-    
-    # Start FastAPI
-    uvicorn.run(app, host="0.0.0.0", port=8000)
-    import os
-import threading
-import uvicorn
-from fastapi import FastAPI
-import discord
-from discord.ext import commands
-import asyncio
-import psxdata
-import pandas as pd
-import numpy as np
-from ta.momentum import RSIIndicator
-from ta.trend import MACD
-
-# ... (Yahan wo saare imports add karein jo bot.py mein hain) ...
-
-app = FastAPI()
+# Bot Setup
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# ... (Yahan WATCHLIST, DIVIDEND_DATABASE aur saare functions paste karein: fetch_data, process_metrics, etc.) ...
+# --- [PASTE ALL YOUR FUNCTIONS HERE: fetch_data, process_metrics, etc.] ---
 
-@bot.command(name="psx")
-async def psx(ctx, symbol: str = None):
-    # Ab yahan aapka asli logic chalega jo bot.py mein tha
-    if not symbol: return await ctx.send("❌ Usage: `!psx BOP`")
-    # ... (yahan process_metrics aur response ka logic aayega) ...
+# --- [PASTE ALL YOUR COMMANDS HERE: !psx, !map, !dashboard, etc.] ---
 
-# 3. Execution
-if __name__ == "__main__":
-    threading.Thread(target=lambda: bot.run(os.getenv("DISCORD_TOKEN")), daemon=True).start()
-    uvicorn.run(app, host="0.0.0.0", port=8000)
-import os
-import threading
-import uvicorn
-from fastapi import FastAPI
-import discord
-from discord.ext import commands, tasks
-import asyncio
-import psxdata
-import pandas as pd
-import numpy as np
-from datetime import datetime, timezone
-import traceback
-import io
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import mplfinance as mpf
-import urllib.request
-import xml.etree.ElementTree as ET
-import html
+@bot.event
+async def on_ready():
+    print(f"Logged in as {bot.user}")
 
-# 1. FastAPI Initialize
-app = FastAPI()
-
-@app.get("/")
-def read_root():
-    return {"message": "PSX Bot Backend is live!"}
-
-# 2. Bot Configuration
-intents = discord.Intents.default()
-intents.message_content = True
-bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
-
-# Variables
-WATCHLIST = ["786", "AABS", "AATM", "ABOT", "ACPL", "ADAMS", "AGHA", "AGTL", "AHCL", "AICL", "AIRLINK"]
-DIVIDEND_DATABASE = {"FFC": {"yield": "14.2%", "payout": "88%", "sector": "Fertilizer"}}
-is_scanning_active = True
-last_signals = {}
-
-# --- [PASTE ALL FUNCTIONS HERE] ---
-# Yahan wo saare functions paste karein jo aapke bot.py mein the:
-# fetch_data(), process_metrics(), generate_chart_buffer(), fetch_symbol_news(), update_dashboard_ui()
-# --- [END FUNCTIONS] ---
-
-# 3. Commands
-@bot.command(name="psx")
-async def psx(ctx, symbol: str = None):
-    # Yahan psx ka logic call karein
-    await ctx.send(f"Processing analysis for {symbol}...")
-
-@bot.command(name="watchlist")
-async def show_watchlist(ctx):
-    await ctx.send(f"📋 **Active Assets:** {', '.join(WATCHLIST)}")
-
-# 4. Bot Execution
+# RUNNER
 def run_bot():
     token = os.getenv("DISCORD_TOKEN")
-    if not token:
-        print("Error: DISCORD_TOKEN missing!")
-        return
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     bot.run(token)
 
 if __name__ == "__main__":
-    # Bot thread start
+    # Start bot in a separate thread
     threading.Thread(target=run_bot, daemon=True).start()
-    
-    # API Server start
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # Start FastAPI
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
