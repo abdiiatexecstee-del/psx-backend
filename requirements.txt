@@ -1,4 +1,6 @@
+discord.py
 fastapi
 uvicorn
-beautifulsoup4
-requests
+pandas
+numpy
+ta
