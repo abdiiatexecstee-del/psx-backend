@@ -704,11 +704,11 @@ def run_discord_bot():
 
 # 2. Initialization Block (Isay file ke bilkul end mein rakhein)
 if __name__ == "__main__":
-    # Threading: Bot ko background mein chalayega
-    threading.Thread(target=run_discord_bot, daemon=True).start()
-    
-    # API Server: Main process mein chalega
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+        # Threading: Bot ko background mein chalayega
+        threading.Thread(target=run_discord_bot, daemon=True).start()
+        
+        # API Server: Main process mein chalega
+        uvicorn.run(app, host="0.0.0.0", port=8000)
 
 @bot.event
 async def on_ready():
@@ -728,3 +728,12 @@ if __name__ == "__main__":
     # Railway ke liye host 0.0.0.0 aur port zaroori hai
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
+# 1. Bot ko wrap karne ke liye function
+def run_discord_bot():
+    bot.run(DISCORD_TOKEN)  # Yeh line 4 spaces aage honi chahiye
+
+# 2. Initialization Block
+if __name__ == "__main__":
+    # Yeh dono lines bhi 4 spaces aage honi chahiye
+    threading.Thread(target=run_discord_bot, daemon=True).start()
+    uvicorn.run(app, host="0.0.0.0", port=8000)
