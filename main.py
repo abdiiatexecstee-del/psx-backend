@@ -1,71 +1,59 @@
-import threading
 import os
+import threading
 import uvicorn
 from fastapi import FastAPI
 import discord
 from discord.ext import commands, tasks
 import asyncio
+import psxdata
 import pandas as pd
 import numpy as np
+from datetime import datetime, timezone
 import traceback
+import io
+import matplotlib
+matplotlib.use('Agg')
+import mplfinance as mpf
 
 # 1. FastAPI App Initialize
 app = FastAPI()
 
 @app.get("/")
 def read_root():
-    return {"message": "Server is live!"}
+    return {"message": "PSX Bot Backend is live!"}
 
 # 2. Discord Bot Setup
 intents = discord.Intents.default()
-intents.message_content = True 
-bot = commands.Bot(command_prefix="!", intents=intents)
+intents.message_content = True
+bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 
-# Configuration
-WATCHLIST = ["786", "AABS", "AATM", "ABOT", "ACPL", "AGHA", "AGTL", "AHCL", "AICL", "AIRLINK"] 
+# Configuration & State
+WATCHLIST = ["786", "AABS", "AATM", "ABOT", "ACPL", "AGHA", "AGTL", "AHCL", "AICL", "AIRLINK"]
+DIVIDEND_DATABASE = {"FFC": {"yield": "14.2%", "payout": "88%", "sector": "Fertilizer"}}
 
-# ================= COMMANDS =================
-@bot.event
-async def on_ready():
-    print(f'Bot is logged in as {bot.user}')
+# [Yahan par aapka process_metrics, fetch_data, aur generate_chart_buffer ka code aayega]
+# (Aapne jo bot.py file di hai, uske functions ko yahan copy karein)
 
-@bot.command(name="hello")
-async def hello(ctx):
-    await ctx.send("Hello! I am running on Railway.")
-
-@bot.command(name="add")
-async def add_symbol(ctx, symbol: str):
-    symbol = symbol.upper()
-    if symbol not in WATCHLIST:
-        WATCHLIST.append(symbol)
-        await ctx.send(f"✅ Appended **{symbol}** to active tracking.")
-    else: await ctx.send(f"ℹ️ **{symbol}** already monitored.")
-
-@bot.command(name="remove")
-async def remove_symbol(ctx, symbol: str):
-    symbol = symbol.upper()
-    if symbol in WATCHLIST:
-        WATCHLIST.remove(symbol)
-        await ctx.send(f"❌ Extracted **{symbol}** from processing.")
-    else: await ctx.send(f"⚠️ **{symbol}** not found.")
+@bot.command(name="psx")
+async def psx(ctx, symbol: str = None):
+    # Aapka psx command logic
+    await ctx.send("PSX Signal logic active!")
 
 @bot.command(name="watchlist")
 async def show_watchlist(ctx):
-    watchlist_str = ", ".join(WATCHLIST)
-    await ctx.send(f"📋 **Active Assets ({len(WATCHLIST)}):**\n```{watchlist_str}```")
+    await ctx.send(f"📋 **Active Assets:** {', '.join(WATCHLIST)}")
 
-# 3. Bot Run Function
+# 3. Execution Engine
 def run_bot():
     token = os.getenv("DISCORD_TOKEN")
-    if token:
-        bot.run(token)
-    else:
-        print("Error: DISCORD_TOKEN not found!")
+    if not token:
+        print("Error: DISCORD_TOKEN missing in Environment Variables")
+        return
+    bot.run(token)
 
-# 4. Main Execution
 if __name__ == "__main__":
-    # Bot thread start
+    # Start Bot in background thread
     threading.Thread(target=run_bot, daemon=True).start()
     
-    # API Server start
+    # Start FastAPI
     uvicorn.run(app, host="0.0.0.0", port=8000)
