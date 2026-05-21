@@ -697,7 +697,7 @@ async def show_watchlist(ctx):
 def run_discord_bot():
     """Discord bot ko alag thread mein chalane ke liye function"""
     # Agar bot pehle se start hai toh dubara na karein
-    if not bot.is_ready():
+if not bot.is_ready():
         # 1. Bot ko wrap karne ke liye function
 def run_discord_bot():
     bot.run(DISCORD_TOKEN)
