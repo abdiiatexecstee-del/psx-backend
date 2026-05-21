@@ -1,3 +1,6 @@
+import threading
+import uvicorn
+from fastapi import FastAPI
 import discord
 from discord.ext import commands, tasks
 from ta.momentum import RSIIndicator
@@ -691,6 +694,12 @@ async def show_watchlist(ctx):
     await ctx.send(f"📋 **Active Structural Array Matrix ({len(WATCHLIST)} assets):**\n```{watchlist_str}```")
 
 # ================= INITIALIZATION BLOCK =================
+def run_discord_bot():
+    """Discord bot ko alag thread mein chalane ke liye function"""
+    # Agar bot pehle se start hai toh dubara na karein
+    if not bot.is_ready():
+        bot.run(DISCORD_TOKEN)
+
 @bot.event
 async def on_ready():
     print(f"=====================================================")
@@ -700,4 +709,12 @@ async def on_ready():
     if not live_scanner_loop.is_running(): 
         live_scanner_loop.start()
 
-bot.run(DISCORD_TOKEN)
+if __name__ == "__main__":
+    # 1. Bot ko background mein start karein
+    bot_thread = threading.Thread(target=run_discord_bot, daemon=True)
+    bot_thread.start()
+    
+    # 2. FastAPI server ko main process mein chalayein
+    # Railway ke liye host 0.0.0.0 aur port zaroori hai
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
