@@ -10,31 +10,34 @@ import threading
 app = FastAPI()
 
 @app.get("/")
-def read_root():
-    return {"status": "online"}
+async def read_root():
+    return {"status": "online", "message": "PSX Bot is running"}
 
-# Bot Setup
+# Bot Configuration
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# --- [PASTE ALL YOUR FUNCTIONS HERE: fetch_data, process_metrics, etc.] ---
-
-# --- [PASTE ALL YOUR COMMANDS HERE: !psx, !map, !dashboard, etc.] ---
+# --- [YAHA SE APNA SARA LOGIC COPY KAREIN] ---
+# Apne bot.py se saare functions: fetch_data(), process_metrics(), 
+# generate_chart_buffer(), commands (@bot.command) yahan paste karein.
+# --- [END LOGIC] ---
 
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user}")
 
-# RUNNER
+# Main Execution Thread
 def run_bot():
-    token = os.getenv("DISCORD_TOKEN")
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
+    token = os.getenv("DISCORD_TOKEN")
     bot.run(token)
 
 if __name__ == "__main__":
-    # Start bot in a separate thread
+    # Start Bot in background thread
     threading.Thread(target=run_bot, daemon=True).start()
-    # Start FastAPI
-    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
+    
+    # Start FastAPI Server (Railway PORT)
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
