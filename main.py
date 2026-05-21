@@ -89,3 +89,71 @@ async def psx(ctx, symbol: str = None):
 if __name__ == "__main__":
     threading.Thread(target=lambda: bot.run(os.getenv("DISCORD_TOKEN")), daemon=True).start()
     uvicorn.run(app, host="0.0.0.0", port=8000)
+import os
+import threading
+import uvicorn
+from fastapi import FastAPI
+import discord
+from discord.ext import commands, tasks
+import asyncio
+import psxdata
+import pandas as pd
+import numpy as np
+from datetime import datetime, timezone
+import traceback
+import io
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import mplfinance as mpf
+import urllib.request
+import xml.etree.ElementTree as ET
+import html
+
+# 1. FastAPI Initialize
+app = FastAPI()
+
+@app.get("/")
+def read_root():
+    return {"message": "PSX Bot Backend is live!"}
+
+# 2. Bot Configuration
+intents = discord.Intents.default()
+intents.message_content = True
+bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
+
+# Variables
+WATCHLIST = ["786", "AABS", "AATM", "ABOT", "ACPL", "ADAMS", "AGHA", "AGTL", "AHCL", "AICL", "AIRLINK"]
+DIVIDEND_DATABASE = {"FFC": {"yield": "14.2%", "payout": "88%", "sector": "Fertilizer"}}
+is_scanning_active = True
+last_signals = {}
+
+# --- [PASTE ALL FUNCTIONS HERE] ---
+# Yahan wo saare functions paste karein jo aapke bot.py mein the:
+# fetch_data(), process_metrics(), generate_chart_buffer(), fetch_symbol_news(), update_dashboard_ui()
+# --- [END FUNCTIONS] ---
+
+# 3. Commands
+@bot.command(name="psx")
+async def psx(ctx, symbol: str = None):
+    # Yahan psx ka logic call karein
+    await ctx.send(f"Processing analysis for {symbol}...")
+
+@bot.command(name="watchlist")
+async def show_watchlist(ctx):
+    await ctx.send(f"📋 **Active Assets:** {', '.join(WATCHLIST)}")
+
+# 4. Bot Execution
+def run_bot():
+    token = os.getenv("DISCORD_TOKEN")
+    if not token:
+        print("Error: DISCORD_TOKEN missing!")
+        return
+    bot.run(token)
+
+if __name__ == "__main__":
+    # Bot thread start
+    threading.Thread(target=run_bot, daemon=True).start()
+    
+    # API Server start
+    uvicorn.run(app, host="0.0.0.0", port=8000)
