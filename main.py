@@ -7,8 +7,6 @@ from discord.ext import commands, tasks
 import asyncio
 import pandas as pd
 import numpy as np
-from ta.momentum import RSIIndicator
-from ta.trend import MACD
 import traceback
 
 # 1. FastAPI App Initialize
@@ -23,10 +21,14 @@ intents = discord.Intents.default()
 intents.message_content = True 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# Configuration Variables
+# Configuration
 WATCHLIST = ["786", "AABS", "AATM", "ABOT", "ACPL", "AGHA", "AGTL", "AHCL", "AICL", "AIRLINK"] 
 
 # ================= COMMANDS =================
+@bot.event
+async def on_ready():
+    print(f'Bot is logged in as {bot.user}')
+
 @bot.command(name="hello")
 async def hello(ctx):
     await ctx.send("Hello! I am running on Railway.")
