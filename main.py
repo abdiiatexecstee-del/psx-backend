@@ -698,7 +698,17 @@ def run_discord_bot():
     """Discord bot ko alag thread mein chalane ke liye function"""
     # Agar bot pehle se start hai toh dubara na karein
     if not bot.is_ready():
-        bot.run(DISCORD_TOKEN)
+        # 1. Bot ko wrap karne ke liye function
+def run_discord_bot():
+    bot.run(DISCORD_TOKEN)
+
+# 2. Initialization Block (Isay file ke bilkul end mein rakhein)
+if __name__ == "__main__":
+    # Threading: Bot ko background mein chalayega
+    threading.Thread(target=run_discord_bot, daemon=True).start()
+    
+    # API Server: Main process mein chalega
+    uvicorn.run(app, host="0.0.0.0", port=8000)
 
 @bot.event
 async def on_ready():
